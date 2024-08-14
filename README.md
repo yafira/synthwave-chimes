@@ -5,4 +5,4 @@ Summer 2024
 
 **description:**
 
-This creative code project displays an interactive digital chime synth, crafted in p5.js. It combines responsive, pastel-colored shapes with dynamic strings that generate synth sounds. A real-time waveform display visualizes the audio output, creating an engaging audiovisual experience.
+A p5.js-crafted digital chime synth merges visuals and sound. Floating shapes and dynamic strings respond to mouse interactions, triggering electronic tones. The responsive design features a bar-like hook, random pastel color palette, seamless string connections, a real-time waveform display visualizing the audio output, creating an engaging audiovisual experience for desktop users, with mobile support coming soon. 
