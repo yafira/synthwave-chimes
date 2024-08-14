@@ -123,7 +123,32 @@ body {
   background-color: #000;
 }
 
+#site-footer {
+  text-align: center;
+  padding: 20px;
+  color: #fff;
+  font-family: "IBM Plex Mono", monospace;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+}
+
+#site-footer a {
+  color: #fff;
+  text-decoration: none;
+}
+
+#site-footer a:hover {
+  color: pink;
+}
+
 /* Media Query for mobile devices */
+
+@media only screen and (max-width: 768px) {
+  #site-footer {
+    font-size: 14px;
+  }
+}
 @media only screen and (max-width: 768px) {
   .circle,
   .flower,
