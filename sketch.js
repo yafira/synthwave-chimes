@@ -122,7 +122,9 @@ function setup() {
     let string = createDiv("").addClass("string");
     let chime = createDiv("").addClass("chime").addClass(shape);
     if (shape === "flower") {
-      chime.html('<img src="https://cdn.glitch.global/3e2cd494-d6a5-41df-8328-01ae17a7f307/flower.png?v=1723595009360" alt="flower" />');
+      chime.html(
+        '<img src="https://cdn.glitch.global/3e2cd494-d6a5-41df-8328-01ae17a7f307/flower.png?v=1723595009360" alt="flower" />'
+      );
       chime.style("background-color", "transparent");
     }
     string.parent(container);
