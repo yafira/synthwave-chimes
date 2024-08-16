@@ -224,15 +224,20 @@ function playChimeSound(index, scale) {
   let scaleIndex = floor(random(scale.length));
   let freq = baseFreq * pow(2, scale[scaleIndex] / 12);
 
-  let velocity = 0.3; // increased velocity for a more pronounced sound
-  let duration = 1.5; // longer duration for each sound
-
   let synth = synths[index];
   if (synth instanceof p5.Oscillator) {
     synth.freq(freq);
-    synth.amp(velocity, 0.05);
+    synth.amp(0, 0); // start with zero amplitude
     synth.start();
-    synth.stop(duration);
+
+    // quick fade in (0.05 seconds)
+    synth.amp(0.3, 0.05);
+
+    // slower fade out (0.5 seconds), starts after 0.05 seconds
+    synth.amp(0, 0.5, 0.05);
+
+    // stop the synth after the fade out completes
+    synth.stop(0.55);
   }
 
   // update frequency text
