@@ -1,4 +1,4 @@
-# synthwave chimes
+# synthwave chimes 🌸🎐🎵
 
 showcase project for [School for Poetic Computation's The Musical Web](https://sfpc.study/sessions/summer-24/musical-web) class,
 Summer 2024
