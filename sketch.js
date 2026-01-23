@@ -1,3 +1,5 @@
+// sketch.js
+
 let strings = [];
 let chimes = [];
 let numChimes = 14;
@@ -9,12 +11,14 @@ let frequencies = [
   261.63, 293.66, 329.63, 349.23, 392.0, 440.0, 493.88, 523.25, 587.33, 659.25,
   698.46, 783.99, 880.0, 987.77,
 ];
+
 let scales = [
   [0, 2, 4, 7, 9], // major scale
   [0, 3, 5, 7, 10], // minor scale
   [0, 2, 4, 5, 7, 9, 11], // pentatonic scale
   [0, 2, 3, 5, 7, 8, 10], // chromatic scale
 ];
+
 let stringLengths = [];
 let shapes = ["circle", "flower", "square", "rectangle"];
 let spacing = 2; // spacing between strings
@@ -64,8 +68,15 @@ let visualizationContainer;
 let waveCanvas;
 let freqDiv;
 
+const FLOWER_SRC = "/flower.png";
+const PURPLE_FLOWER_SRC = "/purple-flower.png"; // rename + put in /public
+
 function setup() {
+  // you were calling triangle() in draw(), but you also had noCanvas().
+  // easiest fix: keep noCanvas() and do NOT draw the triangle in draw().
+  // (use CSS for #hook instead)
   noCanvas();
+
   let container = select("#chime-container");
   let selectedScale = random(scales);
 
@@ -95,7 +106,7 @@ function setup() {
   freqDiv.style("position", "fixed");
   freqDiv.style("bottom", "10px");
   freqDiv.style("left", "10px");
-  freqDiv.style("color", "#fff"); // change color if needed
+  freqDiv.style("color", "#fff");
 
   // initialize chimes and strings
   for (let i = 0; i < numChimes; i++) {
@@ -104,6 +115,8 @@ function setup() {
 
   for (let i = 0; i < numChimes; i++) {
     let shape = shapes[i % shapes.length];
+
+    // audio chain
     let synth = new p5.Oscillator(shapeSynthMap[shape].type);
     let filter = new p5.LowPass();
     let reverb = new p5.Reverb();
@@ -111,6 +124,7 @@ function setup() {
 
     filter.freq(shapeSynthMap[shape].effects.filterFreq);
     filter.res(shapeSynthMap[shape].effects.filterRes);
+
     synth.connect(filter);
     synth.amp(0.1);
 
@@ -119,37 +133,57 @@ function setup() {
 
     synths.push(synth);
 
+    // dom elements
     let string = createDiv("").addClass("string");
     let chime = createDiv("").addClass("chime").addClass(shape);
-    if (shape === "flower") {
-      chime.html(
-        '<img src="https://cdn.glitch.global/3e2cd494-d6a5-41df-8328-01ae17a7f307/flower.png?v=1723595009360" alt="flower" />'
-      );
-      chime.style("background-color", "transparent");
-    }
+
     string.parent(container);
     chime.parent(container);
+
+    // flower asset fix: use /public paths (no glitch UUID cdn)
+    if (shape === "flower") {
+      chime.html(""); // clear
+      const img = createImg(FLOWER_SRC, "flower");
+      img.parent(chime);
+      img.style("width", "100%");
+      img.style("height", "100%");
+      img.style("display", "block");
+      chime.style("background-color", "transparent");
+    }
+
     strings.push(string);
     chimes.push(chime);
 
+    // interactions
     chime.mouseOver(() => {
-      chime.addClass("flip"); // adds flip class
+      chime.addClass("flip");
       playChimeSound(i, selectedScale);
-      if (shape !== "flower") {
+
+      if (shape === "flower") {
+        const imgEl = chime.elt.querySelector("img");
+        if (imgEl) imgEl.src = PURPLE_FLOWER_SRC;
+      } else {
         chime.style("background-color", getRandomColor());
       }
+
       updateVisualization(synth);
     });
 
     chime.mouseOut(() => {
-      chime.removeClass("flip"); // removes flip class
-      if (shape !== "flower") {
+      chime.removeClass("flip");
+
+      if (shape === "flower") {
+        const imgEl = chime.elt.querySelector("img");
+        if (imgEl) imgEl.src = FLOWER_SRC;
+      } else {
         chime.style("background-color", "#000000");
       }
+
       // clear visualization
       visualizationContainer.html("");
     });
   }
+
   updateChimePositions();
 }
 
@@ -157,37 +191,23 @@ function draw() {
   angle += speed;
   let offsetX = sin(angle) * amplitude;
 
-  let barLeft = (windowWidth - barWidth) / 2; // center the bar within the window width
+  let barLeft = (windowWidth - barWidth) / 2;
 
-  // triangular hook
-  let hookX = windowWidth / 2;
-  let hookY = 30; // positions the hook above the strings
-  let hookSize = 40;
-  fill(150);
-  noStroke();
-  triangle(
-    hookX,
-    hookY,
-    hookX - hookSize,
-    hookY + hookSize,
-    hookX + hookSize,
-    hookY + hookSize
-  );
+  // NOTE: removed triangle() drawing because we're using noCanvas()
+  // style the #hook div in CSS instead.
 
   for (let i = 0; i < numChimes; i++) {
     let x = map(i, 0, numChimes - 1, 0, barWidth - spacing) + offsetX;
-    x += barLeft; // bar's left offset to center the strings
+    x += barLeft;
 
-    // x is within the bar's width
     x = constrain(x, barLeft, barLeft + barWidth - spacing);
 
-    let y = hookY + hookSize; // align with the bottom of the hook
+    let y = 70; // hook area baseline
     let stringHeight = stringLengths[i];
 
     strings[i].position(x, y);
     strings[i].size(2, stringHeight);
 
-    // position the chimes centered at the bottom of the strings
     let chimeWidth = chimes[i].elt.offsetWidth;
     chimes[i].position(
       x - chimeWidth / 2 + 1,
@@ -197,26 +217,29 @@ function draw() {
 }
 
 function updateChimePositions() {
-  let barLeft = (windowWidth - barWidth) / 2; // center the bar within the window width
+  let barLeft = (windowWidth - barWidth) / 2;
 
   for (let i = 0; i < numChimes; i++) {
-    let x = map(i, 0, numChimes - 1, 0, barWidth - spacing); // constrain x to within the bar width
-    x += barLeft; // bar's left offset to center the strings
+    let x = map(i, 0, numChimes - 1, 0, barWidth - spacing);
+    x += barLeft;
 
-    let y = 50;
+    let y = 70;
     let stringHeight = stringLengths[i];
 
-    // position strings to appear as if hanging from the hook
-    strings[i].position(x, y - 50); // adjust y to align with the hook
+    strings[i].position(x, y);
     strings[i].size(2, stringHeight);
 
-    // position the chimes centered at the bottom of the strings
     let chimeWidth = chimes[i].elt.offsetWidth;
     chimes[i].position(
       x - chimeWidth / 2 + 1,
-      y + stringHeight - chimes[i].elt.offsetHeight / 2 - 50
-    ); // y to align with the hook
+      y + stringHeight - chimes[i].elt.offsetHeight / 2
+    );
   }
+}
+
+function windowResized() {
+  // re-center everything on resize
+  updateChimePositions();
 }
 
 function playChimeSound(index, scale) {
@@ -227,68 +250,57 @@ function playChimeSound(index, scale) {
   let synth = synths[index];
   if (synth instanceof p5.Oscillator) {
     synth.freq(freq);
-    synth.amp(0, 0); // start with zero amplitude
+    synth.amp(0, 0);
     synth.start();
 
-    // quick fade in (0.05 seconds)
     synth.amp(0.3, 0.05);
-
-    // slower fade out (0.5 seconds), starts after 0.05 seconds
     synth.amp(0, 0.5, 0.05);
 
-    // stop the synth after the fade out completes
     synth.stop(0.55);
   }
 
-  // update frequency text
   freqDiv.html(`Frequency: ${freq.toFixed(2)} Hz`);
 }
 
 function updateVisualization(synth) {
-  // clear the previous visualization
-  waveCanvas.clear();
-  // waveCanvas.background(255); // background color of the canvas
+  visualizationContainer.html("");
 
-  // get waveform data after analyzing the current state
+  waveCanvas.clear();
+
   fft.analyze();
   let waveform = fft.waveform();
 
-  // define colors
   let waveColor = color("#7778A7");
 
-  // draw waveform on the graphics buffer
   waveCanvas.stroke(waveColor);
   waveCanvas.strokeWeight(0.5);
   waveCanvas.noFill();
   waveCanvas.beginShape();
+
   for (let i = 0; i < waveform.length; i++) {
     let x = map(i, 0, waveform.length, 0, waveCanvas.width);
-    let y = map(waveform[i], -1, 1, waveCanvas.height, 0); // flip y-axis
+    let y = map(waveform[i], -1, 1, waveCanvas.height, 0);
     waveCanvas.vertex(x, y);
   }
   waveCanvas.endShape();
 
-  // create an HTML canvas element to display the graphics
   let imgUrl = waveCanvas.canvas.toDataURL();
   let img = createImg(imgUrl, "Waveform Visualization");
-  img.parent(visualizationContainer); // add the image to the visualization container
+  img.parent(visualizationContainer);
 
-  // add frequency text on top of the waveform
-  let freq = synth.freq(); // get frequency
+  let freq = synth.freq();
   if (typeof freq === "number") {
-    // check if freq is a number
     let freqText = `Frequency: ${freq.toFixed(2)} Hz`;
-    let freqDiv = createDiv(freqText).addClass("freq-text");
-    freqDiv.parent(visualizationContainer);
+    let localFreqDiv = createDiv(freqText).addClass("freq-text");
+    localFreqDiv.parent(visualizationContainer);
   } else {
     console.error("Frequency value is not a number or is undefined.");
   }
 }
 
 function getRandomColor() {
-  const r = Math.floor(Math.random() * 56) + 200; // range 200 to 255
+  const r = Math.floor(Math.random() * 56) + 200;
   const g = Math.floor(Math.random() * 56) + 200;
   const b = Math.floor(Math.random() * 56) + 200;
-
   return `rgb(${r}, ${g}, ${b})`;
 }
