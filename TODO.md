@@ -6,4 +6,4 @@
 - [x] add flip animation to flower shapes
 - [x] fade the volume amplitude in and out the chimes (fade in 0.05s, fade out 0.5s)
 - [x] desktop view
-- [ ] mobile view
+- [x] mobile view

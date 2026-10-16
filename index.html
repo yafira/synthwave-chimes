@@ -2,34 +2,49 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
 
     <title>synthwave chimes</title>
+    <meta
+      name="description"
+      content="a p5.js synth wind chime. hover, tap, or drag across the chimes to play."
+    />
     <link rel="stylesheet" type="text/css" href="style.css" />
 
     <link rel="icon" type="image/png" href="purple-flower.png" />
     <link rel="apple-touch-icon" href="purple-flower.png" />
 
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#f2acde" />
   </head>
 
   <body>
     <main id="chime-container">
       <div id="hook" aria-hidden="true"></div>
+
+      <p id="hint">
+        <span class="hint-mouse">click once, then hover over the&nbsp;chimes</span>
+        <span class="hint-touch">tap or drag across the&nbsp;chimes</span>
+      </p>
+
+      <div id="visualization" aria-hidden="true">
+        <div id="freq-text"></div>
+      </div>
     </main>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
-
-    <script src="sketch.js"></script>
 
     <footer id="site-footer">
       <p>
         crafted with 🖤 by
         <a href="https://yafira.xyz/" target="_blank" rel="noopener noreferrer">
-          yafira (electrocute)
+          yafira&nbsp;(electrocute)
         </a>
       </p>
     </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+    <script src="sketch.js"></script>
   </body>
 </html>
